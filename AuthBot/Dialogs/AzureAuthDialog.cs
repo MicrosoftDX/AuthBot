@@ -18,9 +18,10 @@ namespace AuthBot.Dialogs
         private string[] scopes;
         private string prompt;
 
-        public AzureAuthDialog(string resourceId)
+        public AzureAuthDialog(string resourceId, string prompt = "Please click to sign in: ")
         {
             this.resourceId = resourceId;
+            this.prompt = prompt;
         }
         public AzureAuthDialog(string[] scopes,string prompt="Please click to sign in: ")
         {
@@ -101,9 +102,16 @@ namespace AuthBot.Dialogs
                     {
                         var resumptionCookie = new ResumptionCookie(msg);
 
-                        var authenticationUrl = await AzureActiveDirectoryHelper.GetAuthUrlAsync(resumptionCookie, scopes);
+                        String authenticationUrl;
+                        if (string.Equals(AuthSettings.Mode, "vso", StringComparison.OrdinalIgnoreCase))
+                        {
+                            authenticationUrl = VisualStudioOnlineHelper.GetAuthUrlAsync(resumptionCookie);
+                        }
+                        else
+                        { authenticationUrl = await AzureActiveDirectoryHelper.GetAuthUrlAsync(resumptionCookie, scopes); }
 
-                        if (msg.ChannelId == "skype" )
+                        //if (msg.ChannelId == "skype" && !string.Equals(AuthSettings.Mode, "vso", StringComparison.OrdinalIgnoreCase))
+                        if (msg.ChannelId == "skype" || msg.ChannelId == "emulator")
                         {
                              IMessageActivity response = context.MakeMessage();
                              response.Recipient = msg.From;
@@ -157,7 +165,14 @@ namespace AuthBot.Dialogs
                     {
                         var resumptionCookie = new ResumptionCookie(msg);
 
-                        var authenticationUrl = await AzureActiveDirectoryHelper.GetAuthUrlAsync(resumptionCookie, resourceId);
+                        String authenticationUrl;
+                        if (string.Equals(AuthSettings.Mode, "vso", StringComparison.OrdinalIgnoreCase))
+                        {
+                            authenticationUrl = VisualStudioOnlineHelper.GetAuthUrlAsync(resumptionCookie);
+                        }
+                        else
+                        { authenticationUrl = await AzureActiveDirectoryHelper.GetAuthUrlAsync(resumptionCookie, resourceId); }
+
 
                         await context.PostAsync($"You must be authenticated before you can proceed. Please, click [here]({authenticationUrl}) to log into your account.");
 

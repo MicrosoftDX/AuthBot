@@ -18,18 +18,42 @@ namespace AuthBot
             {
                 try
                 {
-                    InMemoryTokenCacheADAL tokenCache = new InMemoryTokenCacheADAL(authResult.TokenCache);
-                    var result = await AzureActiveDirectoryHelper.GetToken(authResult.UserUniqueId, tokenCache, resourceId);
-                    authResult.AccessToken = result.AccessToken;
-                    authResult.ExpiresOnUtcTicks = result.ExpiresOnUtcTicks;
-                    authResult.TokenCache = tokenCache.Serialize();
-                    context.StoreAuthResult(authResult);
+                    //await context.PostAsync($"authToken={authResult.AccessToken}");
+                    //await context.PostAsync($"ExpiresOnUtcTicks={authResult.ExpiresOnUtcTicks}");
+                    if (string.Equals(authResult.authType, "vso", StringComparison.OrdinalIgnoreCase))
+                    {
+                        //is Token still valid ?
+                        if (String.IsNullOrEmpty(authResult.AccessToken))
+                        { await context.PostAsync("GetAccessToken called but no token exists.Logon first."); }
+                        else if (VisualStudioOnlineHelper.IsTokenExpired(authResult.ExpiresOnUtcTicks))
+                        {
+                            //renew token
+                            DateTime expiredDate = new DateTime(authResult.ExpiresOnUtcTicks);
+                            String expireDateStr = expiredDate.ToString("d/M/yyyy HH:mm:ss");
+                            await context.PostAsync($"Your VSO credentials expired on {expireDateStr}");
+                            authResult = await VisualStudioOnlineHelper.RefreshTokenAsync(authResult.refreshToken);
+                            expiredDate = new DateTime(authResult.ExpiresOnUtcTicks);
+                            expireDateStr = expiredDate.ToString("d/M/yyyy HH:mm:ss");
+                            await context.PostAsync($"Token refreshed. New expire time: {expireDateStr}");
+                            context.StoreAuthResult(authResult);
+                            return authResult.AccessToken;
+                        }
+
+                    }
+                    else { 
+                        InMemoryTokenCacheADAL tokenCache = new InMemoryTokenCacheADAL(authResult.TokenCache);
+                        var result = await AzureActiveDirectoryHelper.GetToken(authResult.UserUniqueId, tokenCache, resourceId);
+                        authResult.AccessToken = result.AccessToken;
+                        authResult.ExpiresOnUtcTicks = result.ExpiresOnUtcTicks;
+                        authResult.TokenCache = tokenCache.Serialize();
+                        context.StoreAuthResult(authResult);
+                    }
                 }
                 catch (Exception ex)
                 {
                     Trace.TraceError("Failed to renew token: " + ex.Message);
-                    await context.PostAsync("Your credentials expired and could not be renewed automatically!");
-                    await context.Logout();
+                    await context.PostAsync("Exception in GetAccessToken: " + ex.Message);
+                    //await context.Logout();
                     return null;
                 }
                 return authResult.AccessToken;
@@ -81,11 +105,25 @@ namespace AuthBot
 
         public static async Task Logout(this IBotContext context)
         {
-            context.UserData.RemoveValue(ContextConstants.AuthResultKey);
-            context.UserData.RemoveValue(ContextConstants.MagicNumberKey);
-            context.UserData.RemoveValue(ContextConstants.MagicNumberValidated);
-            string signoutURl = "https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=" + System.Net.WebUtility.UrlEncode(AuthSettings.RedirectUrl);
-            await context.PostAsync($"In order to finish the sign out, please click at this [link]({signoutURl}).");
+            AuthResult authResult;
+            string signoutURl;
+
+            if (context.UserData.TryGetValue(ContextConstants.AuthResultKey, out authResult))
+            { 
+                context.UserData.RemoveValue(ContextConstants.AuthResultKey);
+                context.UserData.RemoveValue(ContextConstants.MagicNumberKey);
+                context.UserData.RemoveValue(ContextConstants.MagicNumberValidated);
+                if (string.Equals(authResult.authType, "vso", StringComparison.OrdinalIgnoreCase))
+                {
+                    signoutURl = "https://app.vssps.visualstudio.com/_signout";
+                }
+                else
+                {
+                    signoutURl = "https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=" + System.Net.WebUtility.UrlEncode(AuthSettings.RedirectUrl);
+                }
+                    
+                await context.PostAsync($"In order to finish the sign out, please click at this [link]({signoutURl}).");
+            }
         }
 
     }

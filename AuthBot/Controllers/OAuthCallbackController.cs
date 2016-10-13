@@ -72,8 +72,10 @@ namespace AuthBot.Controllers
                 {
                 }
 
+
                 // Get the resumption cookie
                 var resumptionCookie = new ResumptionCookie(queryParams["userId"], queryParams["botId"], queryParams["conversationId"], queryParams["channelId"], queryParams["serviceUrl"], queryParams["locale"]);
+
                 // Create the message that is send to conversation to resume the login flow
                 var message = resumptionCookie.GetMessage();
                
@@ -96,7 +98,13 @@ namespace AuthBot.Controllers
                     else if (string.Equals(AuthSettings.Mode, "b2c", StringComparison.OrdinalIgnoreCase))
                     {
                     }
-                    
+                    else if (string.Equals(AuthSettings.Mode, "vso", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Exchange the Auth code with Access token
+                        authResult = await VisualStudioOnlineHelper.GetTokenByAuthCodeAsync(code);
+                    }
+
+
                     IStateClient sc = scope.Resolve<IStateClient>();
 
                     //IMPORTANT: DO NOT REMOVE THE MAGIC NUMBER CHECK THAT WE DO HERE. THIS IS AN ABSOLUTE SECURITY REQUIREMENT

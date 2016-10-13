@@ -11,7 +11,13 @@ namespace AuthBot.Models
         public string UserUniqueId { get; set; }
         public long ExpiresOnUtcTicks { get; set; }
         public byte[] TokenCache { get; set; }
-     
+
+        public String tokenType { get; set; }
+
+        public String refreshToken { get; set; }
+
+        public String authType { get; set; } //if AD or VSO
+
         public static AuthResult FromADALAuthenticationResult(Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationResult authResult, Microsoft.IdentityModel.Clients.ActiveDirectory.TokenCache tokenCache)
         {
             var result = new AuthResult
@@ -20,7 +26,10 @@ namespace AuthBot.Models
                 UserName = $"{authResult.UserInfo.GivenName} {authResult.UserInfo.FamilyName}",
                 UserUniqueId = authResult.UserInfo.UniqueId,
                 ExpiresOnUtcTicks = authResult.ExpiresOn.UtcTicks,
-                TokenCache = tokenCache.Serialize()
+                TokenCache = tokenCache.Serialize(),
+                tokenType = String.Empty,
+                refreshToken = String.Empty,
+                authType = "AD"
             };
 
             return result;
@@ -34,7 +43,31 @@ namespace AuthBot.Models
                 UserName = $"{authResult.User.Name}",
                 UserUniqueId = authResult.User.UniqueId,
                 ExpiresOnUtcTicks = authResult.ExpiresOn.UtcTicks,
-                TokenCache = tokenCache.Serialize()
+                TokenCache = tokenCache.Serialize(),
+                tokenType = String.Empty,
+                refreshToken = String.Empty,
+
+                authType = "AD"
+            };
+
+            return result;
+        }
+
+        public static AuthResult FromVSOAuthenticationResult(VSOAuthResult authResult)
+        {
+
+            long _expiresOnUtcTicks = DateTime.UtcNow.AddSeconds(Int32.Parse(authResult.expiresIn)).Ticks; 
+
+            var result = new AuthResult
+            {
+                AccessToken = authResult.accessToken,
+                UserName = String.Empty,
+                UserUniqueId = String.Empty,
+                ExpiresOnUtcTicks = _expiresOnUtcTicks, 
+                TokenCache = new byte [0],
+                tokenType = authResult.tokenType,
+                refreshToken=authResult.refreshToken,
+                authType = "VSO"
             };
 
             return result;

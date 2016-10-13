@@ -12,6 +12,8 @@ The goals are:
 
 * Enable scenarios where bots need to communicate with other services such as Office 365 or Azure by obtaining access tokens
 
+* Support authentication to Visual Studio Team Services (www.visualstudio.com)
+
 
 ## How does it work?
 
@@ -54,6 +56,15 @@ AAD endpoint V2 is a new, more modern way which still has limitations at this po
 B2C enables users to sign up to your AAD tenant using external identity providers such as Facebook, Google, LinkedIn, Amazon and Microsoft Account. You define policies and the attributes you want to collect during the sign up, for example a user might have to enter their name, e-mail and phone number so that gets recorded into your tenant and accessible to your application.
 
 This model is not yet supported by this library. We're working on it.
+
+### Visual Studio Online (VSO):
+Visual Studio Online (http://www.visualstudio.com).
+To authenticate with VSO you´ll need:
+
+1. You will register an application in https://app.vsaex.visualstudio.com/app/register. Unfortunatly currently you cannot specify localhost as the Authorization Callback URL. So you'll not be able to fully test the authentication flow with Bot Emulator. You will need to deploy to a site other than localhost.
+2. During registration, you will select the scopes that your application needs. The application code itself will request for specific permissions in runtime and it needs to be a subset of the scopes defined in the registration process. The scopes are defined at logon time.
+3. Look at SampleVSOBot project. Configure the appsettings area in web.config with your settings.
+4. [Check here for more details.](SampleVSOBot.md)
 
 ### Tips with setup
 
