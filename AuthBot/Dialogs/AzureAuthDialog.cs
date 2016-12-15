@@ -188,7 +188,7 @@ namespace AuthBot.Dialogs
                         else
                             authenticationUrl = await AzureActiveDirectoryHelper.GetAuthUrlAsync(resumptionCookie, scopes);
 
-                        await PromptLogin(context, msg, authenticationUrl);
+                        await PromptToLogin(context, msg, authenticationUrl);
                         context.Wait(this.MessageReceivedAsync);
                     }
                 }
