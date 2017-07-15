@@ -37,7 +37,7 @@ namespace SampleAADV1Bot.Dialogs
         {
             var message = await item;
 
-            if (message.Text == "logon")
+            if (message.Text.Contains("logon"))
             {
 
 
@@ -51,17 +51,17 @@ namespace SampleAADV1Bot.Dialogs
                     context.Wait(MessageReceivedAsync);
                 }
             }
-            else if (message.Text == "echo")
+            else if (message.Text.Contains("echo"))
             {
                 await context.PostAsync("echo");
 
                 context.Wait(this.MessageReceivedAsync);
             }
-            else if (message.Text == "token")
+            else if (message.Text.Contains("token"))
             {
                 await TokenSample(context);               
             }
-            else if (message.Text == "logout")
+            else if (message.Text.Contains("logout"))
             {
                 await context.Logout();
                 context.Wait(this.MessageReceivedAsync);
