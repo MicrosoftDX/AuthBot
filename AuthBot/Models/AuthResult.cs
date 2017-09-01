@@ -39,6 +39,18 @@ namespace AuthBot.Models
 
             return result;
         }
+
+        public static AuthResult FromMSALAuthenticationResult(string authResult, Microsoft.Identity.Client.TokenCache tokenCache)
+        {
+            var result = new AuthResult
+            {
+                AccessToken = authResult,
+                ExpiresOnUtcTicks = DateTime.UtcNow.AddDays(1).Ticks,
+                TokenCache = tokenCache.Serialize()
+            };
+
+            return result;
+        }
     }
 }
 //*********************************************************

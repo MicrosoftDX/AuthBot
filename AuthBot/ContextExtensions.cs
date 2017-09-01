@@ -58,7 +58,7 @@ namespace AuthBot
                     }
                     else if (string.Equals(AuthSettings.Mode, "b2c", StringComparison.OrdinalIgnoreCase))
                     {
-                        throw new NotImplementedException();
+                       
                     }
                 }
                 catch (Exception ex)

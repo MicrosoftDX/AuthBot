@@ -44,8 +44,9 @@ namespace AuthBot.Controllers
         [HttpGet]
         [Route("api/OAuthCallback")]
         public async Task<HttpResponseMessage> OAuthCallback(
-            [FromUri] string code, 
-            [FromUri] string state, 
+            
+            [FromUri] string state,
+            [FromUri] string code,
             CancellationToken cancellationToken)
         {
             try
@@ -63,6 +64,7 @@ namespace AuthBot.Controllers
                 }
                 else if (string.Equals(AuthSettings.Mode, "b2c", StringComparison.OrdinalIgnoreCase))
                 {
+                    tokenCache = new Microsoft.Identity.Client.TokenCache();
                 }
 
                 var resumptionCookie = UrlToken.Decode<ResumptionCookie>(queryParams);
@@ -87,6 +89,8 @@ namespace AuthBot.Controllers
                     }
                     else if (string.Equals(AuthSettings.Mode, "b2c", StringComparison.OrdinalIgnoreCase))
                     {
+                        var token = await AzureActiveDirectoryHelper.GetB2cTokenByAuthCodeAsync(code, (Microsoft.Identity.Client.TokenCache)tokenCache, Models.AuthSettings.Scopes);
+                        authResult = token;
                     }
                     
                     IStateClient sc = scope.Resolve<IStateClient>();
@@ -137,6 +141,7 @@ namespace AuthBot.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex);
             }
         }
+
 
         private int GenerateRandomNumber()
         {
