@@ -58,7 +58,12 @@ namespace AuthBot
                     }
                     else if (string.Equals(AuthSettings.Mode, "b2c", StringComparison.OrdinalIgnoreCase))
                     {
-                       
+                        InMemoryTokenCacheMSAL tokenCache = new InMemoryTokenCacheMSAL(authResult.TokenCache);
+                        var result = await AzureActiveDirectoryHelper.GetB2CToken(authResult.UserUniqueId, tokenCache, scopes);
+                        authResult.AccessToken = result.AccessToken;
+                        authResult.ExpiresOnUtcTicks = result.ExpiresOnUtcTicks;
+                        authResult.TokenCache = tokenCache.Serialize();
+                        context.StoreAuthResult(authResult);
                     }
                 }
                 catch (Exception ex)

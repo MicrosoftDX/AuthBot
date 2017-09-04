@@ -66,7 +66,7 @@ namespace AuthBot.Helpers
                     "&client_id=" + AuthSettings.ClientId +
                     "&p=" + AuthSettings.Policy +
                     "&redirect_uri=" + HttpUtility.UrlEncode(AuthSettings.RedirectUrl) +
-                    "&scope=" + HttpUtility.UrlEncode("openid profile") +
+                    "&scope=" + HttpUtility.UrlEncode("openid profile offline_access") +
                     "&state=" + extraParameters;
 
 
