@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthBot", "AuthBot\AuthBot.csproj", "{B8AD59D3-C36D-4E18-B504-06871001BC8D}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneDriveBot", "OneDriveBot\OneDriveBot.csproj", "{44BE2EEE-3F57-44D0-A298-C0967048DAE8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleAADv1Bot", "SampleAADv1Bot\SampleAADv1Bot.csproj", "{D2253234-1279-486E-8A63-D8C3424E0525}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleB2CBot", "SampleB2CBot\SampleB2CBot.csproj", "{D1B2B925-D8E2-44F9-A8A1-D07B789AFB34}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,8 +35,15 @@ Global
 		{D2253234-1279-486E-8A63-D8C3424E0525}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D2253234-1279-486E-8A63-D8C3424E0525}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D2253234-1279-486E-8A63-D8C3424E0525}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1B2B925-D8E2-44F9-A8A1-D07B789AFB34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1B2B925-D8E2-44F9-A8A1-D07B789AFB34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1B2B925-D8E2-44F9-A8A1-D07B789AFB34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1B2B925-D8E2-44F9-A8A1-D07B789AFB34}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9607E4D9-B5D4-4868-96E0-864AD81E3EE0}
 	EndGlobalSection
 EndGlobal
