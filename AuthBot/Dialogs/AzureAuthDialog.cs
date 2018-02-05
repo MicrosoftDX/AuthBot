@@ -61,14 +61,22 @@ namespace AuthBot.Dialogs
                     {
                         if (msg.Text == null)
                         {
-                            await context.PostAsync($"Please paste back the number you received in your authentication screen.");
+                            if (msg.ChannelId != "email")
+                            {
+                                await context.PostAsync($"Please paste back the number you received in your authentication screen.");
+                            }
 
                             context.Wait(this.MessageReceivedAsync);
                         }
                         else
                         {
+                            //This is added as wome channels add elements like emails or copy/paste in Teams
+                            string cleanedText = msg.Text;
+                            Match firstmatchedValue = Regex.Match(msg.Text, @"\d+", RegexOptions.IgnorePatternWhitespace);
+                            if (firstmatchedValue.Length > 0)
+                                cleanedText = firstmatchedValue.Value;
 
-                            if (msg.Text.Length >= 6 && magicNumber.ToString() == msg.Text.Substring(0, 6))
+                            if (cleanedText.Length >= 6 && magicNumber.ToString() == cleanedText.Substring(0, 6))
                             {
                                 context.UserData.SetValue<string>(ContextConstants.MagicNumberValidated, "true");
                                 context.Done($"Thanks {authResult.UserName}. You are now logged in. ");

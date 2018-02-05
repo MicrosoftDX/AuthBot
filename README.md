@@ -62,6 +62,8 @@ Regardless of whether you use endpoints v1 or v2, once you register your applica
 Then you need to set both this redirect URI, but also the client ID and secret that the web.config. You will also have to say whether you're using endpoints v1 and v2 (also in the web.config) and which permissions (scopes in case of v2 or resource IDs in case of v1) in there. Again, look at the samples and see how they work.
 
 Common mistake: If you register an app in the v1 mode but try to run the OneDrive sample which uses v2, you will get an error. If the bot is configured for v2 you will have to register it using the new v2 portal as discussed above.
+
+In case you are using AAD v1, make sure you are using the ```public AzureAuthDialog(string resourceId, string prompt = "Please click to sign in: ")``` method to initialize the AzureAuthDialog dialog. In AAD v1, the scopes are not supported, they are not needed. And vice versa, if you are using AAD v2, make sure you are using the ```public AzureAuthDialog(string[] scopes, string prompt = "Please click to sign in: ")```. 
  
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
@@ -72,4 +74,6 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 3.1.2 - Updates to use signin card, workaround for the resumption cookie introduced in the latest BotBuilder version, small fixes
 
 3.6.3 - Updated to latest BotBuilder (3.8.1) and the login method has made protected virtual so folks can override it as needed
+
+3.6.5 - Updated to latest BotBuilder (3.13.0.3). Added support for email by removing one of the message, specific explation in email. Added regex to extract the magic number so support in email as well as Teams can work when you have reach text sent or more text (it does happen when you answer email)
 
