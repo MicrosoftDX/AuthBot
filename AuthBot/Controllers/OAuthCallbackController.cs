@@ -41,6 +41,16 @@ namespace AuthBot.Controllers
             }
 
         }
+
+        public class AddressKey : IAddress
+        {
+            public string BotId { get; set; }
+            public string ChannelId { get; set; }
+            public string ConversationId { get; set; }
+            public string ServiceUrl { get; set; }
+            public string UserId { get; set; }
+        }
+
         [HttpGet]
         [Route("api/OAuthCallback")]
         public async Task<HttpResponseMessage> OAuthCallback(
@@ -89,7 +99,7 @@ namespace AuthBot.Controllers
                     {
                     }
                     
-                    IStateClient sc = scope.Resolve<IStateClient>();
+                    
 
                     //IMPORTANT: DO NOT REMOVE THE MAGIC NUMBER CHECK THAT WE DO HERE. THIS IS AN ABSOLUTE SECURITY REQUIREMENT
                     //REMOVING THIS WILL REMOVE YOUR BOT AND YOUR USERS TO SECURITY VULNERABILITIES. 
@@ -101,11 +111,25 @@ namespace AuthBot.Controllers
                     {
                         try
                         {
-                            BotData userData = sc.BotState.GetUserData(message.ChannelId, message.From.Id);
+                            var botDataStore = scope.Resolve<IBotDataStore<BotData>>();
+                            var key = new AddressKey()
+                            {
+                                BotId = message.Recipient.Id,
+                                ChannelId = message.ChannelId,
+                                UserId = message.From.Id,
+                                ConversationId = message.Conversation.Id,
+                                ServiceUrl = message.ServiceUrl
+                            };
+
+                            var userData = await botDataStore.LoadAsync(key, BotStoreType.BotUserData, CancellationToken.None);
+
                             userData.SetProperty(ContextConstants.AuthResultKey, authResult);
                             userData.SetProperty(ContextConstants.MagicNumberKey, magicNumber);
                             userData.SetProperty(ContextConstants.MagicNumberValidated, "false");
-                            sc.BotState.SetUserData(message.ChannelId, message.From.Id, userData);
+
+                            await botDataStore.SaveAsync(key, BotStoreType.BotUserData, userData, CancellationToken.None);
+                            await botDataStore.FlushAsync(key, CancellationToken.None);
+
                             writeSuccessful = true;
                         }
                         catch (HttpOperationException)
