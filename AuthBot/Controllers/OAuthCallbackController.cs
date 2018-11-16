@@ -125,6 +125,8 @@ namespace AuthBot.Controllers
                         await Conversation.ResumeAsync(resumptionCookie, message);
                         if (message.ChannelId == "skypeforbusiness")
                             resp.Content = new StringContent($"<html><body>Almost done! Please copy this number and paste it back to your chat so your authentication can complete:<br/> {magicNumber} </body></html>", System.Text.Encoding.UTF8, @"text/html");
+                        else if (message.ChannelId == "email")
+                            resp.Content = new StringContent($"<html><body>Almost done! Please reply to the email you've received asking you to authenticate with this number so your authentication can complete:<br/> {magicNumber} </body></html>", System.Text.Encoding.UTF8, @"text/html");
                         else
                             resp.Content = new StringContent($"<html><body>Almost done! Please copy this number and paste it back to your chat so your authentication can complete:<br/> <h1>{magicNumber}</h1>.</body></html>", System.Text.Encoding.UTF8, @"text/html");
                     }
